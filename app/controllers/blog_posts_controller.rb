@@ -1,23 +1,18 @@
 class BlogPostsController < ApplicationController
   before_action :authenticate_user!, except: %i[index show]
-  before_action :set_blog_post, only: %i[show edit update destroy]
+  before_action :set_blog_post, except: [:index, :new, :create]
   def index
-    @blog_posts = BlogPost.all
+    @blog_posts = user_signed_in? ? BlogPost.sorted : BlogPost.published.sorted
   end
   def show
-  rescue ActiveRecord::RecordNotFound
-    redirect_to root_path
   end
 
   def new
-    if user_signed_in?
     @blog_post = BlogPost.new
-    else
-      redirect_to new_user_session_path
-    end
   end
 
   def create
+    @blog_post = BlogPost.new(blog_post_params)
     if @blog_post.save
       redirect_to @blog_post
     else
@@ -43,11 +38,11 @@ class BlogPostsController < ApplicationController
 
    private
   def blog_post_params
-     params.require(:blog_post).permit(:title, :body)
+     params.require(:blog_post).permit(:title, :body, :published_at)
   end
 
   def set_blog_post
-    @blog_post = BlogPost.find(params[:id])
+    @blog_post = user_signed_in? ? BlogPost.find(params[:id]) : BlogPost.published.find(params[:id])
   rescue ActiveRecord::RecordNotFound
     redirect_to root_path
   end
