@@ -13,8 +13,13 @@
   </div>
 
   <div>
-    <%= form.label :body %>
-    <%= form.text_area :body %>
+    <%= form.label :cover_image %>
+    <%= form.file_field :cover_image %>
+  </div>
+
+  <div>
+    <%= form.label :content %>
+    <%= form.rich_text_area :content %>
   </div>
 
   <div>
